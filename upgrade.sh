@@ -35,7 +35,6 @@ pushd ${oneinstack_dir} > /dev/null
 . ./include/upgrade_redis.sh
 . ./include/upgrade_memcached.sh
 . ./include/upgrade_phpmyadmin.sh
-. ./include/upgrade_oneinstack.sh
 
 # get the out ip country
 OUTIP_STATE=$(./include/ois.${ARCH} ip_state)
@@ -54,13 +53,12 @@ Show_Help() {
   --redis        [version]    Upgrade Redis
   --memcached    [version]    Upgrade Memcached
   --phpmyadmin   [version]    Upgrade phpMyAdmin
-  --oneinstack                Upgrade OneinStack latest
   --acme.sh                   Upgrade acme.sh latest
   "
 }
 
 ARG_NUM=$#
-TEMP=`getopt -o h --long help,nginx:,tengine:,openresty:,apache:,tomcat:,db:,php:,redis:,memcached:,phpmyadmin:,oneinstack,acme.sh -- "$@" 2>/dev/null`
+TEMP=`getopt -o h --long help,nginx:,tengine:,openresty:,apache:,tomcat:,db:,php:,redis:,memcached:,phpmyadmin:,acme.sh -- "$@" 2>/dev/null`
 [ $? != 0 ] && echo "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
 eval set -- "${TEMP}"
 while :; do
@@ -99,9 +97,6 @@ while :; do
     --phpmyadmin)
       phpmyadmin_flag=y; NEW_phpmyadmin_ver=$2; shift 2
       ;;
-    --oneinstack)
-      NEW_oneinstack_ver=latest; shift 1
-      ;;
     --acme.sh)
       NEW_acme_ver=latest; shift 1
       ;;
@@ -126,8 +121,7 @@ What Are You Doing?
 \t${CMSG} 6${CEND}. Upgrade Redis
 \t${CMSG} 7${CEND}. Upgrade Memcached
 \t${CMSG} 8${CEND}. Upgrade phpMyAdmin
-\t${CMSG} 9${CEND}. Upgrade OneinStack latest
-\t${CMSG}10${CEND}. Upgrade acme.sh latest
+\t${CMSG} 9${CEND}. Upgrade acme.sh latest
 \t${CMSG} q${CEND}. Exit
 "
     echo
@@ -163,9 +157,6 @@ What Are You Doing?
           Upgrade_phpMyAdmin
           ;;
         9)
-          Upgrade_OneinStack
-          ;;
-        10)
           [ -e ~/.acme.sh/acme.sh ] && { ~/.acme.sh/acme.sh --force --upgrade; ~/.acme.sh/acme.sh --version; }
           ;;
         q)
@@ -189,6 +180,5 @@ else
   [ "${redis_flag}" == 'y' ] && Upgrade_Redis
   [ "${memcached_flag}" == 'y' ] && Upgrade_Memcached
   [ "${phpmyadmin_flag}" == 'y' ] && Upgrade_phpMyAdmin
-  [ "${NEW_oneinstack_ver}" == 'latest' ] && Upgrade_OneinStack
   [ "${NEW_acme_ver}" == 'latest' ] && [ -e ~/.acme.sh/acme.sh ] && { ~/.acme.sh/acme.sh --force --upgrade; ~/.acme.sh/acme.sh --version; }
 fi
