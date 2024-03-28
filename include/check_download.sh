@@ -18,7 +18,7 @@ checkDownload() {
   # General system utils
   if [ "${with_old_openssl_flag}" == 'y' ]; then
     echo "Download openSSL..."
-    src_url=https://www.openssl.org/source/old/1.0.2/openssl-${openssl_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/openssl-${openssl_ver}.tar.gz && Download_src
     echo "Download cacert.pem..."
     src_url=https://curl.se/ca/cacert.pem && Download_src
   fi
@@ -26,7 +26,7 @@ checkDownload() {
   # openssl1.1
   if [[ ${nginx_option} =~ ^[1-3]$ ]]; then
       echo "Download openSSL1.1..."
-      src_url=https://www.openssl.org/source/openssl-${openssl11_ver}.tar.gz && Download_src
+      src_url=${mirror_link}/oneinstack/src/openssl-${openssl11_ver}.tar.gz && Download_src
   fi
 
   # jemalloc
@@ -35,11 +35,17 @@ checkDownload() {
     src_url=${mirror_link}/oneinstack/src/jemalloc-${jemalloc_ver}.tar.bz2 && Download_src
   fi
 
+  # pcre
+  if [[ "${nginx_option}" =~ ^[1-3]$ ]] || [ "${apache_flag}" == 'y' ]; then
+    echo "Download pcre..."
+    src_url=${mirror_link}/oneinstack/src/pcre-${pcre_ver}.tar.gz && Download_src
+  fi
+
   # nginx/tengine/openresty
   case "${nginx_option}" in
     1)
       echo "Download nginx..."
-      src_url=http://nginx.org/download/nginx-${nginx_ver}.tar.gz && Download_src
+      src_url=${mirror_link}/oneinstack/src/nginx-${nginx_ver}.tar.gz && Download_src
       ;;
     2)
       echo "Download tengine..."
@@ -48,14 +54,20 @@ checkDownload() {
       ;;
     3)
       echo "Download openresty..."
-      src_url=https://openresty.org/download/openresty-${openresty_ver}.tar.gz && Download_src
+      src_url=${mirror_link}/oneinstack/src/openresty-${openresty_ver}.tar.gz && Download_src
       ;;
   esac
 
-  # pcre
-  if [[ "${nginx_option}" =~ ^[1-3]$ ]] || [ "${apache_flag}" == 'y' ]; then
-    echo "Download pcre..."
-    src_url=https://downloads.sourceforge.net/project/pcre/pcre/${pcre_ver}/pcre-${pcre_ver}.tar.gz && Download_src
+  # if nginx_option=4 download caddy
+  if [ "${nginx_option}" == '4' ]; then
+    echo "Download caddy ${caddy_ver}"
+    src_url=${mirror_link}/caddy/v${caddy_ver}/caddy-${caddy_ver}.tar.gz  && Download_src
+  fi
+
+  # caddy
+  if [ "${caddy_flag}" == 'y' ]; then
+    echo "Download caddy ${caddy_ver}"
+    src_url=${mirror_link}/caddy/v${caddy_ver}/caddy-${caddy_ver}.tar.gz  && Download_src
   fi
 
   # apache
@@ -109,7 +121,7 @@ checkDownload() {
         # MySQL 8.0
         if [ "${OUTIP_STATE}"x == "China"x ]; then
           DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-8.0
-          DOWN_ADDR_MYSQL_BK=http://repo.huaweicloud.com/mysql/Downloads/MySQL-8.0
+          DOWN_ADDR_MYSQL_BK=https://mirrors.aliyun.com/mysql/MySQL-8.0
           DOWN_ADDR_MYSQL_BK2=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-8.0
         else
           DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-8.0
@@ -144,7 +156,7 @@ checkDownload() {
         # MySQL 5.7
         if [ "${OUTIP_STATE}"x == "China"x ]; then
           DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
-          DOWN_ADDR_MYSQL_BK=http://repo.huaweicloud.com/mysql/Downloads/MySQL-5.7
+          DOWN_ADDR_MYSQL_BK=https://mirrors.aliyun.com/mysql/MySQL-5.7
           DOWN_ADDR_MYSQL_BK2=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.7
         else
           DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
@@ -180,7 +192,7 @@ checkDownload() {
         if [ "${OUTIP_STATE}"x == "China"x ]; then
           DOWN_ADDR_MYSQL=http://mirrors.aliyun.com/mysql/MySQL-5.6
           DOWN_ADDR_MYSQL_BK=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.6
-          DOWN_ADDR_MYSQL_BK2=http://repo.huaweicloud.com/mysql/Downloads/MySQL-5.6
+          DOWN_ADDR_MYSQL_BK2=https://mirrors.aliyun.com/mysql/MySQL-5.6
         else
           DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
           DOWN_ADDR_MYSQL_BK=https://mirrors.dotsrc.org/mysql/Downloads/MySQL-5.6
@@ -215,7 +227,7 @@ checkDownload() {
         if [ "${OUTIP_STATE}"x == "China"x ]; then
           DOWN_ADDR_MYSQL=http://mirrors.aliyun.com/mysql/MySQL-5.5
           DOWN_ADDR_MYSQL_BK=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.5
-          DOWN_ADDR_MYSQL_BK2=http://repo.huaweicloud.com/mysql/Downloads/MySQL-5.5
+          DOWN_ADDR_MYSQL_BK2=https://mirrors.aliyun.com/mysql/MySQL-5.5
         else
           DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.5
           DOWN_ADDR_MYSQL_BK=https://mirrors.dotsrc.org/mysql/Downloads/MySQL-5.5
@@ -534,12 +546,12 @@ checkDownload() {
   elif [ "${php_option}" == '12' ] || [ "${mphp_ver}" == '82' ]; then
     src_url=https://secure.php.net/distributions/php-${php82_ver}.tar.gz && Download_src
     src_url=${mirror_link}/oneinstack/src/argon2-${argon2_ver}.tar.gz && Download_src
-    src_url=${mirror_link}/oneinstack/src/libsodium-${libsodium_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/libsodium-${libsodium_up_ver}.tar.gz && Download_src
     src_url=${mirror_link}/oneinstack/src/libzip-${libzip_ver}.tar.gz && Download_src
   elif [ "${php_option}" == '13' ] || [ "${mphp_ver}" == '83' ]; then
     src_url=https://secure.php.net/distributions/php-${php83_ver}.tar.gz && Download_src
     src_url=${mirror_link}/oneinstack/src/argon2-${argon2_ver}.tar.gz && Download_src
-    src_url=${mirror_link}/oneinstack/src/libsodium-${libsodium_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/libsodium-${libsodium_up_ver}.tar.gz && Download_src
     src_url=${mirror_link}/oneinstack/src/libzip-${libzip_ver}.tar.gz && Download_src
   fi
 
