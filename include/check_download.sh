@@ -20,7 +20,7 @@ checkDownload() {
     echo "Download openSSL..."
     src_url=${mirror_link}/oneinstack/src/openssl-${openssl_ver}.tar.gz && Download_src
     echo "Download cacert.pem..."
-    src_url=https://curl.se/ca/cacert.pem && Download_src
+    src_url=${mirror_link}/oneinstack/src/cacert.pem && Download_src
   fi
 
   # openssl1.1
@@ -49,7 +49,6 @@ checkDownload() {
       ;;
     2)
       echo "Download tengine..."
-      #src_url=http://tengine.taobao.org/download/tengine-${tengine_ver}.tar.gz && Download_src
       src_url=${mirror_link}/oneinstack/src/tengine-${tengine_ver}.tar.gz && Download_src
       ;;
     3)
@@ -73,10 +72,10 @@ checkDownload() {
   # apache
   if [ "${apache_flag}" == 'y' ]; then
     echo "Download apache 2.4..."
-    src_url=http://archive.apache.org/dist/httpd/httpd-${apache_ver}.tar.gz && Download_src
-    src_url=http://archive.apache.org/dist/apr/apr-${apr_ver}.tar.gz && Download_src
-    src_url=http://archive.apache.org/dist/apr/apr-util-${apr_util_ver}.tar.gz && Download_src
-    src_url=${mirror_link}/apache/httpd/nghttp2-${nghttp2_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/httpd-${apache_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/apr-${apr_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/apr-util-${apr_util_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/nghttp2-${nghttp2_ver}.tar.gz && Download_src
   fi
 
   # tomcat
@@ -103,7 +102,7 @@ checkDownload() {
   # jdk apr
   if [[ "${jdk_option}"  =~ ^[1-2]$ ]]; then
     echo "Download apr..."
-    src_url=http://archive.apache.org/dist/apr/apr-${apr_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/apr-${apr_ver}.tar.gz && Download_src
   fi
 
   if [[ "${db_option}" =~ ^[1-9]$|^1[0-4]$ ]]; then
@@ -111,7 +110,7 @@ checkDownload() {
       [[ "${db_option}" =~ ^[2,5,6,7]$|^10$ ]] && boost_ver=${boost_oldver}
       [[ "${db_option}" =~ ^9$ ]] && boost_ver=${boost_percona_ver}
       echo "Download boost..."
-      [ "${OUTIP_STATE}"x == "China"x ] && DOWN_ADDR_BOOST=${mirror_link}/oneinstack/src || DOWN_ADDR_BOOST=https://downloads.sourceforge.net/project/boost/boost/${boost_ver}
+      DOWN_ADDR_BOOST=${mirror_link}/oneinstack/src
       boostVersion2=$(echo ${boost_ver} | awk -F. '{print $1"_"$2"_"$3}')
       src_url=${DOWN_ADDR_BOOST}/boost_${boostVersion2}.tar.gz && Download_src
     fi
@@ -119,15 +118,7 @@ checkDownload() {
     case "${db_option}" in
       1)
         # MySQL 8.0
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-8.0
-          DOWN_ADDR_MYSQL_BK=https://mirrors.aliyun.com/mysql/MySQL-8.0
-          DOWN_ADDR_MYSQL_BK2=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-8.0
-        else
-          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-8.0
-          DOWN_ADDR_MYSQL_BK=https://mirrors.dotsrc.org/mysql/Downloads/MySQL-8.0
-        fi
-
+        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 8.0 binary package..."
           FILE_NAME=mysql-${mysql80_ver}-linux-glibc2.12-x86_64.tar.xz
@@ -137,32 +128,10 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME} && Download_src
-        src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME}.md5 && Download_src
-        # verifying download
-        MYSQL_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${MYSQL_TAR_MD5}" ] && MYSQL_TAR_MD5=$(curl -s ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MYSQL_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       2)
         # MySQL 5.7
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
-          DOWN_ADDR_MYSQL_BK=https://mirrors.aliyun.com/mysql/MySQL-5.7
-          DOWN_ADDR_MYSQL_BK2=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.7
-        else
-          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
-          DOWN_ADDR_MYSQL_BK=https://mirrors.dotsrc.org/mysql/Downloads/MySQL-5.7
-        fi
-
+        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.7 binary package..."
           FILE_NAME=mysql-${mysql57_ver}-linux-glibc2.12-x86_64.tar.gz
@@ -172,32 +141,10 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME} && Download_src
-        src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME}.md5 && Download_src
-        # verifying download
-        MYSQL_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${MYSQL_TAR_MD5}" ] && MYSQL_TAR_MD5=$(curl -s ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MYSQL_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       3)
         # MySQL 5.6
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_MYSQL=http://mirrors.aliyun.com/mysql/MySQL-5.6
-          DOWN_ADDR_MYSQL_BK=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.6
-          DOWN_ADDR_MYSQL_BK2=https://mirrors.aliyun.com/mysql/MySQL-5.6
-        else
-          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
-          DOWN_ADDR_MYSQL_BK=https://mirrors.dotsrc.org/mysql/Downloads/MySQL-5.6
-        fi
-
+        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.6 binary package..."
           FILE_NAME=mysql-${mysql56_ver}-linux-glibc2.12-x86_64.tar.gz
@@ -207,32 +154,10 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME} && Download_src
-        src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME}.md5 && Download_src
-        # verifying download
-        MYSQL_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${MYSQL_TAR_MD5}" ] && MYSQL_TAR_MD5=$(curl -s ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MYSQL_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       4)
         # MySQL 5.5
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_MYSQL=http://mirrors.aliyun.com/mysql/MySQL-5.5
-          DOWN_ADDR_MYSQL_BK=http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.5
-          DOWN_ADDR_MYSQL_BK2=https://mirrors.aliyun.com/mysql/MySQL-5.5
-        else
-          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.5
-          DOWN_ADDR_MYSQL_BK=https://mirrors.dotsrc.org/mysql/Downloads/MySQL-5.5
-        fi
-
+        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.5 binary package..."
           FILE_NAME=mysql-${mysql55_ver}-linux-glibc2.12-x86_64.tar.gz
@@ -243,20 +168,6 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME} && Download_src
-        src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME}.md5 && Download_src
-        # verifying download
-        MYSQL_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${MYSQL_TAR_MD5}" ] && MYSQL_TAR_MD5=$(curl -s ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MYSQL_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       [5-8])
 	case "${db_option}" in
@@ -276,40 +187,13 @@ checkDownload() {
 
         if [ "${dbinstallmethod}" == '1' ]; then
           FILE_NAME=mariadb-${mariadb_ver}-linux-systemd-x86_64.tar.gz
-	  FILE_TYPE=bintar-linux-systemd-x86_64
         elif [ "${dbinstallmethod}" == '2' ]; then
           FILE_NAME=mariadb-${mariadb_ver}.tar.gz
-	  FILE_TYPE=source
         fi
 
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_MARIADB=http://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-${mariadb_ver}/${FILE_TYPE}
-          DOWN_ADDR_MARIADB_BK=http://mirrors.ustc.edu.cn/mariadb/mariadb-${mariadb_ver}/${FILE_TYPE}
-        else
-          DOWN_ADDR_MARIADB=https://archive.mariadb.org/mariadb-${mariadb_ver}/${FILE_TYPE}
-          DOWN_ADDR_MARIADB_BK=http://mirror.nodesdirect.com/mariadb/mariadb-${mariadb_ver}/${FILE_TYPE}
-        fi
-
-        if [ "${db_option}" == '8' ]; then
-          DOWN_ADDR_MARIADB=https://archive.mariadb.org/mariadb-${mariadb_ver}/${FILE_TYPE}
-          DOWN_ADDR_MARIADB_BK=${DOWN_ADDR_MARIADB}
-        fi
-
+        DOWN_ADDR_MARIADB=${mirror_link}/oneinstack/src
         echo "Download MariaDB ${FILE_NAME} package..."
         src_url=${DOWN_ADDR_MARIADB}/${FILE_NAME} && Download_src
-        wget --tries=6 -c --no-check-certificate ${DOWN_ADDR_MARIADB}/md5sums.txt -O ${FILE_NAME}.md5
-        MARAIDB_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${MARAIDB_TAR_MD5}" ] && MARAIDB_TAR_MD5=$(curl -s ${DOWN_ADDR_MARIADB_BK}/md5sums.txt | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MARAIDB_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_MARIADB_BK}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MARAIDB_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       9)
         # Percona 8.0
@@ -328,20 +212,6 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_PERCONA}/${FILE_NAME} && Download_src
-        src_url=${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum && Download_src
-        # verifying download
-        PERCONA_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5sum)
-        [ -z "${PERCONA_TAR_MD5}" ] && PERCONA_TAR_MD5=$(curl -s ${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${PERCONA_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_PERCONA}/${FILE_NAME}; sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${PERCONA_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       10)
         # Precona 5.7
@@ -360,20 +230,6 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_PERCONA}/${FILE_NAME} && Download_src
-        src_url=${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum && Download_src
-        # verifying download
-        PERCONA_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5sum)
-        [ -z "${PERCONA_TAR_MD5}" ] && PERCONA_TAR_MD5=$(curl -s ${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${PERCONA_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_PERCONA}/${FILE_NAME}; sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${PERCONA_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       11)
         # Precona 5.6
@@ -393,20 +249,6 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_PERCONA}/${FILE_NAME} && Download_src
-        src_url=${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum && Download_src
-        # verifying download
-        PERCONA_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5sum)
-        [ -z "${PERCONA_TAR_MD5}" ] && PERCONA_TAR_MD5=$(curl -s ${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${PERCONA_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_PERCONA}/${FILE_NAME}; sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${PERCONA_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       12)
         # Percona 5.5
@@ -426,68 +268,18 @@ checkDownload() {
         fi
         # start download
         src_url=${DOWN_ADDR_PERCONA}/${FILE_NAME} && Download_src
-        src_url=${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum && Download_src
-        # verifying download
-        PERCONA_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5sum)
-        [ -z "${PERCONA_TAR_MD5}" ] && PERCONA_TAR_MD5=$(curl -s ${mirror_link}/oneinstack/src/${FILE_NAME}.md5sum | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${PERCONA_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_PERCONA}/${FILE_NAME}; sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${PERCONA_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       13)
         FILE_NAME=postgresql-${pgsql_ver}.tar.gz
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_PGSQL=https://mirrors.tuna.tsinghua.edu.cn/postgresql/source/v${pgsql_ver}
-          DOWN_ADDR_PGSQL_BK=https://mirrors.ustc.edu.cn/postgresql/source/v${pgsql_ver}
-        else
-          DOWN_ADDR_PGSQL=https://ftp.postgresql.org/pub/source/v${pgsql_ver}
-          DOWN_ADDR_PGSQL_BK=https://ftp.heanet.ie/mirrors/postgresql/source/v${pgsql_ver}
-        fi
+        DOWN_ADDR_PGSQL_BK=${mirror_link}/oneinstack/src
         src_url=${DOWN_ADDR_PGSQL}/${FILE_NAME} && Download_src
-        src_url=${DOWN_ADDR_PGSQL}/${FILE_NAME}.md5 && Download_src
-        PGSQL_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${PGSQL_TAR_MD5}" ] && PGSQL_TAR_MD5=$(curl -s ${DOWN_ADDR_PGSQL_BK}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${PGSQL_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_PGSQL_BK}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${PGSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
       14)
         # MongoDB
         echo "Download MongoDB binary package..."
         FILE_NAME=mongodb-linux-x86_64-${mongodb_ver}.tgz
-        if [ "${OUTIP_STATE}"x == "China"x ]; then
-          DOWN_ADDR_MongoDB=${mirror_link}/oneinstack/src
-        else
-          DOWN_ADDR_MongoDB=https://fastdl.mongodb.org/linux
-        fi
+        DOWN_ADDR_MongoDB=${mirror_link}/oneinstack/src
         src_url=${DOWN_ADDR_MongoDB}/${FILE_NAME} && Download_src
-        src_url=${DOWN_ADDR_MongoDB}/${FILE_NAME}.md5 && Download_src
-        MongoDB_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
-        [ -z "${MongoDB_TAR_MD5}" ] && MongoDB_TAR_MD5=$(curl -s ${DOWN_ADDR_MongoDB}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
-        tryDlCount=0
-        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MongoDB_TAR_MD5}" ]; do
-          wget -c --no-check-certificate ${DOWN_ADDR_MongoDB}/${FILE_NAME};sleep 1
-          let "tryDlCount++"
-          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MongoDB_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
-        done
-        if [ "${tryDlCount}" == '6' ]; then
-          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
-          kill -9 $$; exit 1;
-        fi
         ;;
     esac
   fi
@@ -496,10 +288,10 @@ checkDownload() {
   if [[ "${php_option}" =~ ^[1-9]$|^1[0-3]$ ]] || [[ "${mphp_ver}" =~ ^5[3-6]$|^7[0-4]$|^8[0-3]$ ]]; then
     echo "PHP common..."
     src_url=${mirror_link}/oneinstack/src/libiconv-${libiconv_ver}.tar.gz && Download_src
-    src_url=https://curl.haxx.se/download/curl-${curl_ver}.tar.gz && Download_src
-    src_url=https://downloads.sourceforge.net/project/mhash/mhash/${mhash_ver}/mhash-${mhash_ver}.tar.gz && Download_src
-    src_url=https://downloads.sourceforge.net/project/mcrypt/Libmcrypt/${libmcrypt_ver}/libmcrypt-${libmcrypt_ver}.tar.gz && Download_src
-    src_url=https://downloads.sourceforge.net/project/mcrypt/MCrypt/${mcrypt_ver}/mcrypt-${mcrypt_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/curl-${curl_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/mhash/mhash/${mhash_ver}/mhash-${mhash_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/mcrypt/Libmcrypt/${libmcrypt_ver}/libmcrypt-${libmcrypt_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/mcrypt/MCrypt/${mcrypt_ver}/mcrypt-${mcrypt_ver}.tar.gz && Download_src
     src_url=${mirror_link}/oneinstack/src/freetype-${freetype_ver}.tar.gz && Download_src
   fi
 
@@ -575,8 +367,9 @@ checkDownload() {
     3)
       if [[ "${php_option}" =~ ^[1-4]$ ]]; then
         # php 5.3 5.4 5.5 5.6
+        # TODO need delete
         echo "Download xcache..."
-        src_url=http://xcache.lighttpd.net/pub/Releases/${xcache_ver}/xcache-${xcache_ver}.tar.gz && Download_src
+        src_url=http://xcache.lighttpd.net/pub/Releases/${xcache_ver}/xcache-${xcache_ver}.tar.gz && Download_src 
       fi
       ;;
     4)
@@ -616,7 +409,7 @@ checkDownload() {
   # ioncube
   if [ "${pecl_ioncube}" == '1' ]; then
     echo "Download ioncube..."
-    src_url=https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${SYS_ARCH_i}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/ioncube_loaders_lin_${SYS_ARCH_i}.tar.gz && Download_src
   fi
 
   # SourceGuardian
@@ -640,6 +433,7 @@ checkDownload() {
   # graphicsmagick
   if [ "${pecl_gmagick}" == '1' ]; then
     echo "Download graphicsmagick..."
+    # TODO need check
     src_url=https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${graphicsmagick_ver}/GraphicsMagick-${graphicsmagick_ver}.tar.gz && Download_src
     if [[ "${php_option}" =~ ^[1-4]$ ]]; then
       echo "Download gmagick for php..."
@@ -653,7 +447,7 @@ checkDownload() {
   # redis-server
   if [ "${redis_flag}" == 'y' ]; then
     echo "Download redis-server..."
-    src_url=http://download.redis.io/releases/redis-${redis_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/redis-${redis_ver}.tar.gz && Download_src
   fi
 
   # pecl_redis
@@ -673,14 +467,14 @@ checkDownload() {
   # memcached-server
   if [ "${memcached_flag}" == 'y' ]; then
     echo "Download memcached-server..."
-    [ "${OUTIP_STATE}"x == "China"x ] && DOWN_ADDR=${mirror_link}/oneinstack/src || DOWN_ADDR=http://www.memcached.org/files
+    DOWN_ADDR=${mirror_link}/oneinstack/src
     src_url=${DOWN_ADDR}/memcached-${memcached_ver}.tar.gz && Download_src
   fi
 
   # pecl_memcached
   if [ "${pecl_memcached}" == '1' ]; then
     echo "Download libmemcached..."
-    src_url=https://launchpad.net/libmemcached/1.0/${libmemcached_ver}/+download/libmemcached-${libmemcached_ver}.tar.gz && Download_src
+    src_url=${mirror_link}/oneinstack/src/libmemcached-${libmemcached_ver}.tar.gz && Download_src
     if [[ "${php_option}" =~ ^[1-4]$ ]]; then
       echo "Download pecl_memcached for php..."
       src_url=https://pecl.php.net/get/memcached-${pecl_memcached_oldver}.tgz && Download_src

@@ -49,7 +49,6 @@ Install_pecl_memcache() {
       tar xzf memcache-${pecl_memcache_oldver}.tgz
       pushd memcache-${pecl_memcache_oldver} > /dev/null
     else
-      #git clone https://github.com/websupport-sk/pecl-memcache.git
       tar xzf memcache-${pecl_memcache_ver}.tgz
       pushd memcache-${pecl_memcache_ver} > /dev/null
     fi

@@ -16,7 +16,7 @@ Install_pecl_imap() {
         cat > /etc/yum.repos.d/remi.repo << EOF
 [remi]
 name=Remi's RPM repository for Enterprise Linux 9 - \$basearch
-mirrorlist=http://cdn.remirepo.net/enterprise/9/remi/\$basearch/mirror
+mirrorlist=https://cdn.remirepo.net/enterprise/9/remi/\$basearch/mirror
 enabled=0
 gpgcheck=0
 EOF
