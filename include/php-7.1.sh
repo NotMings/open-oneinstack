@@ -55,7 +55,7 @@ Install_PHP71() {
   fi
 
   if [ ! -e "/usr/local/include/mhash.h" -a ! -e "/usr/include/mhash.h" ]; then
-    tar xzf mhash-${mhash_ver}.tar.gz
+    tar xjf mhash-${mhash_ver}.tar.bz2
     pushd mhash-${mhash_ver} > /dev/null
     ./configure
     make -j ${THREAD} && make install
