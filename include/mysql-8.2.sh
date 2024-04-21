@@ -21,15 +21,13 @@ Install_MySQL82() {
     mv mysql-${mysql82_ver}-linux-glibc2.17-x86_64/* ${mysql_install_dir}
     sed -i "s@/usr/local/mysql@${mysql_install_dir}@g" ${mysql_install_dir}/bin/mysqld_safe
   elif [ "${dbinstallmethod}" == "2" ]; then
-    boostVersion2=$(echo ${boost_ver} | awk -F. '{print $1"_"$2"_"$3}')
-    tar xzf boost_${boostVersion2}.tar.gz
     tar xzf mysql-${mysql82_ver}.tar.gz
     pushd mysql-${mysql82_ver}
     [ -e "/usr/bin/cmake3" ] && CMAKE=cmake3 || CMAKE=cmake
     $CMAKE . -DCMAKE_INSTALL_PREFIX=${mysql_install_dir} \
     -DMYSQL_DATADIR=${mysql_data_dir} \
     -DDOWNLOAD_BOOST=1 \
-    -DWITH_BOOST=../boost_${boostVersion2} \
+    -DWITH_BOOST=../mysql_boost \
     -DFORCE_INSOURCE_BUILD=1 \
     -DSYSCONFDIR=/etc \
     -DWITH_INNOBASE_STORAGE_ENGINE=1 \
