@@ -118,12 +118,13 @@ checkDownload() {
     case "${db_option}" in
       1)
         # MySQL 8.0
-        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 8.0 binary package..."
+          DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
           FILE_NAME=mysql-${mysql80_ver}-linux-glibc2.12-x86_64.tar.xz
         elif [ "${dbinstallmethod}" == '2' ]; then
           echo "Download MySQL 8.0 source package..."
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-8.0
           FILE_NAME=mysql-${mysql80_ver}.tar.gz
         fi
         # start download
@@ -131,12 +132,13 @@ checkDownload() {
         ;;
       2)
         # MySQL 5.7
-        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.7 binary package..."
+          DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
           FILE_NAME=mysql-${mysql57_ver}-linux-glibc2.12-x86_64.tar.gz
         elif [ "${dbinstallmethod}" == '2' ]; then
           echo "Download MySQL 5.7 source package..."
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
           FILE_NAME=mysql-${mysql57_ver}.tar.gz
         fi
         # start download
@@ -144,12 +146,13 @@ checkDownload() {
         ;;
       3)
         # MySQL 5.6
-        DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.6 binary package..."
+          DOWN_ADDR_MYSQL=${mirror_link}/oneinstack/src
           FILE_NAME=mysql-${mysql56_ver}-linux-glibc2.12-x86_64.tar.gz
         elif [ "${dbinstallmethod}" == '2' ]; then
           echo "Download MySQL 5.6 source package..."
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
           FILE_NAME=mysql-${mysql56_ver}.tar.gz
         fi
         # start download
