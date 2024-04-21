@@ -55,7 +55,7 @@ Install_MySQL82() {
     if [ "${dbinstallmethod}" == "1" ]; then
       rm -rf mysql-${mysql82_ver}-*-x86_64
     elif [ "${dbinstallmethod}" == "2" ]; then
-      rm -rf mysql-${mysql82_ver} boost_${boostVersion2}
+      rm -rf mysql-${mysql82_ver} mysql_boost
     fi
   else
     rm -rf ${mysql_install_dir}

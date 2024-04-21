@@ -52,7 +52,7 @@ Install_MySQL57() {
     if [ "${dbinstallmethod}" == "1" ]; then
       rm -rf mysql-${mysql57_ver}-*-x86_64
     elif [ "${dbinstallmethod}" == "2" ]; then
-      rm -rf mysql-${mysql57_ver} boost_${boostVersion2}
+      rm -rf mysql-${mysql57_ver} mysql_boost
     fi
   else
     rm -rf ${mysql_install_dir}
