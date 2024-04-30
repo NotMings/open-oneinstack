@@ -231,7 +231,7 @@ WEB_S3_BK() {
       tar czf ${PUSH_FILE} ./$W
       popd > /dev/null
     fi
-    aws s3 sync ${PUSH_FILE} s3://${s3_bucket}/`date +%F`/${PUSH_FILE##*/}
+    aws s3 cp ${PUSH_FILE} s3://${s3_bucket}/`date +%F`/${PUSH_FILE##*/}
     if [ $? -eq 0 ]; then
       aws s3 rm -r s3://${s3_bucket}/`date +%F --date="${expired_days} days ago"` > /dev/null 2>&1
       [ -z "`echo ${backup_destination} | grep -ow 'local'`" ] && rm -f ${PUSH_FILE}
